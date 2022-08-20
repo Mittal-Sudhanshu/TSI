@@ -7,7 +7,6 @@ import 'package:teacher_student_interaction/mainScreen.dart';
 import 'package:teacher_student_interaction/registrationScreen.dart';
 import 'package:teacher_student_interaction/searchScreen.dart';
 import 'package:teacher_student_interaction/splashScreen.dart';
-import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:teacher_student_interaction/themeClass.dart';
 
 bool permissionGranted=false;

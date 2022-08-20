@@ -8,7 +8,6 @@ import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:motion_toast/motion_toast.dart';
 import 'package:motion_toast/resources/arrays.dart';
 import 'package:teacher_student_interaction/loginScreen.dart';
-import 'package:teacher_student_interaction/mainScreen.dart';
 String Email='';
 String Password='';
 String Name='';
@@ -100,7 +99,7 @@ class _OTPState extends State<OTP> {
       inAsyncCall: showSpinner,
       child: Scaffold(
         body: AnimatedGradient(
-          colors: [Color(0xFFe73c7e),Color(0xFF23a6d5),Color(0xFF23d5ab),Color(0xFFee7752)],
+          colors: [const Color(0xFFe73c7e),const Color(0xFF23a6d5),const Color(0xFF23d5ab),const Color(0xFFee7752)],
           child: SafeArea(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -125,7 +124,7 @@ class _OTPState extends State<OTP> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children:  [
                        Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.0,vertical: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0,vertical: 10),
                         child: Material(
                           elevation: 15,
                           child: TextField(
@@ -134,7 +133,7 @@ class _OTPState extends State<OTP> {
                             onChanged: (value){
                               otp=int.parse(value);
                             },
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               border: InputBorder.none,
                               hintText: 'Enter OTP',
                             ),
@@ -168,8 +167,8 @@ class _OTPState extends State<OTP> {
                                 });
                                 // print(e);
                               }
-                            }, child: Text('Resend OTP')),
-                            TextButton(onPressed: (){Navigator.pop(context);}, child: Text('Incorrect Email?')),
+                            }, child: const Text('Resend OTP')),
+                            TextButton(onPressed: (){Navigator.pop(context);}, child: const Text('Incorrect Email?')),
                           ],
                         )
                       )
@@ -180,7 +179,7 @@ class _OTPState extends State<OTP> {
                     response=await checkOTP(otp);
                     if(response==201){
                       _displaySuccessMotionToast();
-                      Timer(Duration(seconds: 3), () {Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>LoginScreen())); });
+                      Timer(const Duration(seconds: 3), () {Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>const LoginScreen())); });
                     }
                     else{
                       setState(() {
@@ -191,7 +190,7 @@ class _OTPState extends State<OTP> {
                   }catch(e){
                     // print(e);
                   }
-                }, child: Text('Submit'),style:ButtonStyle(elevation: MaterialStateProperty.all(20)) ,))
+                }, child: const Text('Submit'),style:ButtonStyle(elevation: MaterialStateProperty.all(20)) ,))
               ],
             ),
           ),

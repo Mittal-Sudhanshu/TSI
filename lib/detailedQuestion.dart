@@ -1,12 +1,11 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:teacher_student_interaction/detailedSolution.dart';
 import 'package:teacher_student_interaction/submitSolution.dart';
 import 'cardStyle.dart';
 import 'package:http/http.dart' as http;
-import 'homeScreen.dart';
 
 
 class DetailedQuestion extends StatefulWidget {
@@ -111,7 +110,10 @@ class _DetailedQuestionState extends State<DetailedQuestion> {
                 itemCount: _soljson.length,
                 itemBuilder: (BuildContext context, int index) {
                   final soln=_soljson[index];
-                  return CardStyle(onPressedQ: (){},heading:'Solution' ,description: soln['solution'],);
+                  return CardStyle(onPressedQ: (){
+                    const DetailedSolution().getSolution(soln['solution']);
+                    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=>DetailedSolution()));
+                  },heading:null ,description: soln['solution'],);
                 },
               )
             ],

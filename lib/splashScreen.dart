@@ -2,16 +2,12 @@ import 'dart:async';
 
 
 import 'package:flutter/material.dart';
-import 'package:teacher_student_interaction/otpInput.dart';
-import 'package:teacher_student_interaction/homeScreen.dart';
 import 'package:animated_gradient/animated_gradient.dart';
 import 'package:animated_splash_screen/animated_splash_screen.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:circular_image/circular_image.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:teacher_student_interaction/loginScreen.dart';
 import 'package:teacher_student_interaction/mainScreen.dart';
-import 'package:animate_gradient/animate_gradient.dart';
 
 String? finalEmail;
 class SplashScreen extends StatefulWidget {
@@ -55,7 +51,7 @@ class _SplashScreenState extends State<SplashScreen> {
     return AnimatedSplashScreen(
       backgroundColor: Colors.white,
       splash: AnimatedGradient(
-        colors: [Color(0xFFe73c7e),Color(0xFF23a6d5),Color(0xFF23d5ab),Color(0xFFee7752)],
+        colors: const [Color(0xFFe73c7e),Color(0xFF23a6d5),Color(0xFF23d5ab),Color(0xFFee7752)],
 
         // primaryColors: [Color(0xFFee7752),Color(0xFF23a6d5)],
         // secondaryColors: [Color(0xFFe73c7e),Color(0xFF23d5ab)],
@@ -78,7 +74,7 @@ class _SplashScreenState extends State<SplashScreen> {
           ],
         ),
       ),
-      nextScreen: finalEmail==null?LoginScreen():MainScreen(),
+      nextScreen: finalEmail==null?const LoginScreen():const MainScreen(),
       splashIconSize: 1000,
 
 

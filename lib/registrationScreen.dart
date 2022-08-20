@@ -84,7 +84,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     return Scaffold(
       // backgroundColor: Colors.black,
       body: AnimatedGradient(
-        colors: [Color(0xFFe73c7e),Color(0xFF23a6d5),Color(0xFF23d5ab),Color(0xFFee7752)],
+        colors: const [Color(0xFFe73c7e),Color(0xFF23a6d5),Color(0xFF23d5ab),Color(0xFFee7752)],
         child: SafeArea(
           child: ModalProgressHUD(
             inAsyncCall: showSpinner,
@@ -210,7 +210,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
                                     _displaySuccessMotionToast();
 
-                                    Timer(Duration(seconds: 3),(){OTP().getData(email,name,password);Navigator.pushNamed(context, 'otpScreen');});
+                                    Timer(const Duration(seconds: 3),(){const OTP().getData(email,name,password);Navigator.pushNamed(context, 'otpScreen');});
                                   } else if(response==400) {
                                     setState(() {
                                       error=body['error'];
