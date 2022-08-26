@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:teacher_student_interaction/cardStyle.dart';
 import 'package:teacher_student_interaction/detailedQuestion.dart';
 import 'package:http/http.dart' as http;
@@ -8,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 String name=' ';
 String? token;
 bool showSpinner=false;
-String url='http://192.168.1.8:5000/api/question/yourquestion';
+String url='https://tsi-backend.herokuapp.com/api/question/yourquestion';
 var _quesJson=[];
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -98,6 +99,7 @@ class MyQuestions extends StatefulWidget {
   @override
   State<MyQuestions> createState() => _MyQuestionsState();
 }
+var names=[];
 
 class _MyQuestionsState extends State<MyQuestions> {
   @override
@@ -128,13 +130,20 @@ class _MyQuestionsState extends State<MyQuestions> {
       final response = await http.get(Uri.parse(url), headers: header);
       // final resp=dio.post(url,he)
       final jsonData = jsonDecode(response.body) as List;
-
+      var namee = [];
+      jsonData.forEach((element) {
+        Map obj = element;
+        Map user = obj['user'];
+        String name = user['name'];
+        namee.add(name);
+      });
 
       // print(response.body);
       setState(() {
         showSpinner=false;
         _quesJson = jsonData;
         _quesJson=List.from(_quesJson.reversed);
+        names=namee;
       });
     } catch (err) {
       setState(() {
@@ -149,26 +158,30 @@ class _MyQuestionsState extends State<MyQuestions> {
     return Scaffold(
       appBar: AppBar(title: const Text('My Questions'),
       ),
-      body: ListView.builder( scrollDirection: Axis.vertical,
-        // physics: const NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        itemCount: _quesJson.length,
-        itemBuilder: (BuildContext context, int index) {
-          final ques = _quesJson[index];
-          return CardStyle(
-            onPressedQ: () {
-              const DetailedQuestion().getHeadingDescription(
-                  ques['heading'], ques['description'],ques['_id']);
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const DetailedQuestion()));
-            },
-            heading: ques['heading'],
-            description: ques['description'],
-            category: ques['category'],
-          );
-        },),
+      body:ModalProgressHUD(
+        inAsyncCall: showSpinner,
+        child: ListView.builder( scrollDirection: Axis.vertical,
+            // physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: _quesJson.length,
+            itemBuilder: (BuildContext context, int index) {
+              final ques = _quesJson[index];
+              return CardStyle(
+                onPressedQ: () {
+                  const DetailedQuestion().getHeadingDescription(
+                      ques['heading'], ques['description'],ques['_id'],names[index],ques['image']);
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const DetailedQuestion()));
+                },
+                heading: ques['heading'],
+                description: ques['description'],
+                category: ques['category'],
+                name: names[index],
+              );
+            },),
+      ),
     );
   }
 }

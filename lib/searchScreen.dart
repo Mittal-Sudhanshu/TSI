@@ -13,6 +13,7 @@ String? searchText;
 var _jsonData = [];
 bool showSpinner = false;
 String? token;
+var names=[];
 String? error;
 
 class SearchScreen extends StatefulWidget {
@@ -47,13 +48,21 @@ class _SearchScreenState extends State<SearchScreen> {
         'Accept': 'application/json',
         'Authorization': 'Bearer $token'
       };
-      String url = 'http://192.168.1.8:5000/api/question?search=$searchText';
+      String url = 'https://tsi-backend.herokuapp.com/api/question?search=$searchText';
       try {
         final response = await http.get(Uri.parse(url), headers: headers);
         final jsonData = jsonDecode(response.body) as List;
+        var namee=[];
+        jsonData.forEach((element) {
+          Map obj = element;
+          Map user = obj['user'];
+          String name = user['name'];
+          namee.add(name);
+        });
         setState(() {
           showSpinner = false;
           _jsonData = jsonData;
+          names=namee;
         });
         // print(response.body);
         return response.statusCode;
@@ -160,7 +169,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   return CardStyle(
                       onPressedQ: () {
                         const DetailedQuestion().getHeadingDescription(
-                            ques['heading'], ques['description'], ques['_id']);
+                            ques['heading'], ques['description'], ques['_id'],names[index],ques['image']);
                         Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -168,7 +177,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                 const DetailedQuestion()));
                       },
                       heading: ques['heading'],
-                      description: ques['description']);
+                      description: ques['description'],
+                  name: names[index],);
                 }),
           ],
         ),

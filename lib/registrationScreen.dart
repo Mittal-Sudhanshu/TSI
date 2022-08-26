@@ -58,7 +58,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   Future<dynamic> postData(String name, String email, String password) async {
     try {
       var response = await http.post(
-          Uri.parse('http://192.168.1.8:5000/api/user/'),
+          Uri.parse('https://tsi-backend.herokuapp.com/api/user/'),
           headers: header,
           body:
               jsonEncode({"name": name, "email": email, "password": password}));

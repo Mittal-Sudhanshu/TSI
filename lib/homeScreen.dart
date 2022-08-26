@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_typing_uninitialized_variables
+
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -14,8 +16,10 @@ import 'package:http/http.dart' as http;
 String head = '';
 String? token;
 bool showSpinner=false;
+var names=[];
+String e='';
 String desc = '';
-String url = 'http://192.168.1.8:5000/api/question';
+String url = 'https://tsi-backend.herokuapp.com/api/question';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -29,6 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     _quesJson=[];
+    e='';
     getToken();
     fetchQues();
     super.initState();
@@ -50,6 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       showSpinner=true;
     });
+    getToken().whenComplete(() async{
       try {
         Map<String, String> header = {
           'Content-type': 'application/json',
@@ -60,20 +66,33 @@ class _HomeScreenState extends State<HomeScreen> {
         // dio.interceptors.add(DioCacheManager(CacheConfig(baseUrl: "http://www.google.com")).interceptor);
         final response = await http.get(Uri.parse(url), headers: header);
         // final resp=dio.post(url,he)
+        var namee = [];
         final jsonData = jsonDecode(response.body) as List;
-        // print(response.body);
+        jsonData.forEach((element) {
+          Map obj = element;
+          Map user = obj['user'];
+          String name = user['name'];
+          namee.add(name);
+        });
+        print(response.body);
         setState(() {
-          showSpinner=false;
+          showSpinner = false;
           _quesJson = jsonData;
-          _quesJson=List.from(_quesJson.reversed);
+          if(_quesJson.isEmpty){
+            e='No question exits currently';
+          }
+          names = namee;
+          _quesJson = List.from(_quesJson.reversed);
+          names = List.from(names.reversed);
         });
       } catch (err) {
         setState(() {
-          showSpinner=false;
-
+          if(this.mounted)
+            showSpinner = false;
         });
         // print(err);
       }
+    });
   }
 
   @override
@@ -94,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       title: const Text(' All '),
                       onTap: (){
                         setState(() {
-                          url='http://192.168.1.8:5000/api/question';
+                          url='https://tsi-backend.herokuapp.com/api/question';
                           fetchQues();
                         });
 
@@ -111,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       onTap: () {
                         setState(() {
-                          url='http://192.168.1.8:5000/api/question/Hostel';
+                          url='https://tsi-backend.herokuapp.com/api/question/Hostel';
                           fetchQues();
                         });
                         Navigator.pop(context);
@@ -129,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       onTap: () {
 
                         setState(() {
-                          url='http://192.168.1.8:5000/api/question/Academic';
+                          url='https://tsi-backend.herokuapp.com/api/question/Academic';
                           fetchQues();
                         });
                         Navigator.pop(context);
@@ -143,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       title: const Text(' Scholarships ', style: TextStyle()),
                       onTap: () {
                         setState(() {
-                          url='http://192.168.1.8:5000/api/question/Scholarshpis';
+                          url='https://tsi-backend.herokuapp.com/api/question/Scholarshpis';
                           fetchQues();
                         });
                         Navigator.pop(context);
@@ -157,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       title: const Text(' Mess ', style: TextStyle()),
                       onTap: () {
                         setState(() {
-                          url='http://192.168.1.8:5000/api/question/Mess';
+                          url='https://tsi-backend.herokuapp.com/api/question/Mess';
                           fetchQues();
                         });
                         Navigator.pop(context);
@@ -170,7 +189,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       title: const Text(' Programming ', style: TextStyle()),
                       onTap: () {
                         setState(() {
-                          url='http://192.168.1.8:5000/api/question/Programming';
+                          url='https://tsi-backend.herokuapp.com/api/question/Programming';
                           fetchQues();
                         });
                         Navigator.pop(context);
@@ -229,13 +248,16 @@ class _HomeScreenState extends State<HomeScreen> {
           scrollDirection: Axis.vertical,
           // physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
-          itemCount: _quesJson.length,
+          itemCount: _quesJson.isNotEmpty?_quesJson.length:1,
           itemBuilder: (BuildContext context, int index) {
-            final ques = _quesJson[index];
-            return CardStyle(
+            var ques;
+            if(_quesJson.isNotEmpty) {
+              ques = _quesJson[index];
+            }
+            return _quesJson.isNotEmpty?CardStyle(
               onPressedQ: () {
                 const DetailedQuestion().getHeadingDescription(
-                    ques['heading'], ques['description'],ques['_id']);
+                    ques['heading'], ques['description'],ques['_id'],names[index],ques['image']);
                 Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -244,7 +266,8 @@ class _HomeScreenState extends State<HomeScreen> {
               heading: ques['heading'],
               description: ques['description'],
               category: ques['category'],
-            );
+              name:names[index]
+            ): Center(child: Text(e,style: const TextStyle(fontSize: 20),),);
           },
         ),
         floatingActionButton: FloatingActionButton.extended(

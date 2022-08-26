@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_typing_uninitialized_variables, use_build_context_synchronously
 
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'dart:io';
@@ -9,16 +10,17 @@ import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:motion_toast/motion_toast.dart';
+import 'package:dio/dio.dart';
 import 'package:motion_toast/resources/arrays.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:teacher_student_interaction/homeScreen.dart';
 
 String? heading ;
 String? description ;
-List<File> image = [];
 int length = 0;
 String? token;
 bool showSpinner = false;
-var categories = ['Hostel', 'Academic', 'Scholarships', 'Mess'];
+var categories = ['Hostel', 'Academic', 'Scholarships', 'Mess','Programming'];
 String dropDownValue = 'Academic';
 
 class NewQuestion extends StatefulWidget {
@@ -29,6 +31,9 @@ class NewQuestion extends StatefulWidget {
 }
 
 class _NewQuestionState extends State<NewQuestion> {
+
+
+  File? image=null  ;
   @override
   void initState() {
     // TODO: implement initState
@@ -37,17 +42,13 @@ class _NewQuestionState extends State<NewQuestion> {
   }
 
   void _openGallery(BuildContext context) async {
-    final pickedFile = await ImagePicker().pickMultiImage(
-        // source: ImageSource.gallery,
+    final pickedFile = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
         );
     setState(
       () {
-        for (int i = 0; i < pickedFile!.length; i++) {
-          image.add(File(pickedFile[i].path));
-        }
-      },
-    );
-
+          image=File(pickedFile!.path);
+        });
     Navigator.pop(context);
   }
 
@@ -58,7 +59,7 @@ class _NewQuestionState extends State<NewQuestion> {
     setState(
       () {
         File f = File(pickedFile!.path);
-        image.add(f);
+        image=f;
       },
     );
     Navigator.pop(context);
@@ -108,23 +109,46 @@ class _NewQuestionState extends State<NewQuestion> {
   }
 
   var body;
-  Future<dynamic> postData(String? headi, String? desci, String category) async {
+  Future<dynamic> postData(String? headi, String? desci, String category,File? image) async {
+    var response;
     try {
-      Map<String, String> header = {
-        'Content-type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $token'
-      };
-      var response = await http.post(
-          Uri.parse('http://192.168.1.8:5000/api/question/'),
-          headers: header,
-          body: jsonEncode(
-              {"heading": headi, "description": desci, "category": category}));
-      // print(response.body);
-      body = jsonDecode(response.body);
-      return (response.statusCode);
+      if(image!=null){
+        Map<String, String> header = {'Authorization': 'Bearer $token'};
+        String fileName = image.path.split('/').last;
+        FormData formData = FormData.fromMap({
+          "heading": headi,
+          "description": desci,
+          "category": category,
+          "image": await MultipartFile.fromFile(image.path, filename: fileName),
+        });
+        response = await Dio()
+            .post(url, data: formData, options: Options(headers: header));
+        // return response.statusCode;
+        // print(response);
+        // print(response.statusCode);
+        // print(body);
+        return (response.statusCode);
+      }
+      else{
+        Map<String, String> header = {'Authorization': 'Bearer $token'};
+        FormData formData = FormData.fromMap({
+          "heading": headi,
+          "description": desci,
+          "category": category,
+
+        });
+        response = await Dio()
+            .post(url, data: formData, options: Options(headers: header));
+        // return response.statusCode;
+        print(response);
+        print(response.statusCode);
+        // print(body);
+        return (response.statusCode);
+      }
     } catch (e) {
-      // print(e);
+      print(e);
+      print(body);
+      print(response.statusCode);
     }
   }
 
@@ -157,8 +181,8 @@ class _NewQuestionState extends State<NewQuestion> {
                         heading = value;
                       },
                       decoration: const InputDecoration(
-                          hintText: 'Heading', border: InputBorder.none
-                          // hintStyle: TextStyle(color: Colors.white),
+                          hintText: 'Title', border: InputBorder.none,
+                          hintStyle: TextStyle(fontWeight: FontWeight.bold),
 
                           ),
                     ),
@@ -185,7 +209,7 @@ class _NewQuestionState extends State<NewQuestion> {
                           description = value;
                         },
                         decoration: const InputDecoration(
-                            hintText: 'Description', border: InputBorder.none
+                            hintText: 'Explain your problem', border: InputBorder.none
                             // hintStyle: TextStyle(color: Colors.white),
 
                             ),
@@ -288,13 +312,8 @@ class _NewQuestionState extends State<NewQuestion> {
                 SizedBox(
                     height: 200,
                     width: 400,
-                    child: image != []
-                        ? ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            shrinkWrap: true,
-                            itemCount: image.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return Container(
+                    child: image != null
+                        ?  Container(
                                 alignment: Alignment.center,
                                 // width: double.maxFinite,
                                 height: 200,
@@ -327,8 +346,7 @@ class _NewQuestionState extends State<NewQuestion> {
                                                       TextButton(
                                                           onPressed: () {
                                                             setState(() {
-                                                              image.removeAt(
-                                                                  index);
+                                                              image=null;
                                                               Navigator.of(
                                                                       dialogContext)
                                                                   .pop();
@@ -348,7 +366,7 @@ class _NewQuestionState extends State<NewQuestion> {
                                               backgroundColor:
                                                   MaterialStateProperty.all(
                                                       Colors.transparent)),
-                                          child: Image.file(image[index],
+                                          child: Image.file(image!,
                                               fit: BoxFit.fitWidth),
                                         ),
                                       )
@@ -356,8 +374,6 @@ class _NewQuestionState extends State<NewQuestion> {
                                         'hello',
                                         style: TextStyle(fontSize: 40),
                                       ),
-                              );
-                            },
                           )
                         : null
                           )
@@ -391,10 +407,17 @@ class _NewQuestionState extends State<NewQuestion> {
                                 showSpinner = true;
                               });
                               try {
-
-                                var response = await postData(
-                                    heading, description, dropDownValue);
+                                var response;
+                                if(image!=null) {
+                                  response = await postData(
+                                    heading, description, dropDownValue,image);
+                                }
+                                else{
+                                  response = await postData(
+                                      heading, description, dropDownValue,null);
+                                }
                                 if (response == 200) {
+                                  image=null;
                                   _displaySuccessMotionToast();
                                   // print(body);// Navigator.pop(context);
                                 } else {

@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -12,8 +13,8 @@ import 'package:motion_toast/resources/arrays.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 String? heading;
-String? solution ;
-List<File> image = [];
+String? solution;
+File? image = null;
 String? token;
 bool showSpinner = false;
 String? userId;
@@ -71,37 +72,50 @@ class _SubmitSolutionState extends State<SubmitSolution> {
     ).show(context);
   }
 
-  postSolution(String? soltion) async {
-
-      try {
-        // print(soltion);
-        // print(questionId);
-        const url = 'http://192.168.1.8:5000/api/solution';
-        Map<String, String> header = {
-          'Content-type': 'application/json',
-          'Accept': 'application/json',
-          'Authorization': 'Bearer $token'
-        };
-        final response = await http.post(Uri.parse(url),
-            headers: header,
-            body: jsonEncode({"solution": soltion, "questionId": questionId}));
-        body = jsonDecode(response.body);
-        // print(response.statusCode);
+  postSolution(String? soltion, File? image) async {
+    var response;
+    try {
+      String url = 'https://tsi-backend.herokuapp.com/api/solution/';
+      if (image != null) {
+        Map<String, String> header = {'Authorization': 'Bearer $token'};
+        String fileName = image.path.split('/').last;
+        FormData formData = FormData.fromMap({
+          "solution": soltion,
+          "questionId":questionId,
+          "image": await MultipartFile.fromFile(image.path, filename: fileName),
+        });
+        response = await Dio()
+            .post(url, data: formData, options: Options(headers: header));
+        // return response.statusCode;
+        print(response);
+        print(response.statusCode);
+        // print(body);
         return (response.statusCode);
-      } catch (err) {
-        // print(err);
+      } else {
+        Map<String, String> header = {'Authorization': 'Bearer $token'};
+        FormData formData = FormData.fromMap({'solution': soltion,"questionId":questionId});
+        response = await Dio()
+            .post(url, data: formData, options: Options(headers: header));
+        // return response.statusCode;
+        print(response);
+        print(response.statusCode);
+        // print(body);
+        return (response.statusCode);
       }
+    } catch (e) {
+      print(e);
+      print(body);
+      print(response.statusCode);
+    }
   }
 
   void _openGallery(BuildContext context) async {
-    final pickedFile = await ImagePicker().pickMultiImage(
-        // source: ImageSource.gallery,
-        );
+    final pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+    );
     setState(
       () {
-        for (int i = 0; i < pickedFile!.length; i++) {
-          image.add(File(pickedFile[i].path));
-        }
+        image = File(pickedFile!.path);
       },
     );
 
@@ -115,17 +129,19 @@ class _SubmitSolutionState extends State<SubmitSolution> {
     setState(
       () {
         File f = File(pickedFile!.path);
-        image.add(f);
+        image = (f);
       },
     );
     Navigator.pop(context);
   }
-@override
+
+  @override
   void initState() {
     // TODO: implement initState
-  getTokenId();
+    getTokenId();
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -242,74 +258,63 @@ class _SubmitSolutionState extends State<SubmitSolution> {
               SizedBox(
                 height: 200,
                 width: 400,
-                child: image != []
-                    ? ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        shrinkWrap: true,
-                        itemCount: image.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Container(
-                            alignment: Alignment.center,
-                            // width: double.maxFinite,
-                            height: 200,
-                            child: image != []
-                                ? Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: ElevatedButton(
-                                      onPressed: () {},
-                                      onLongPress: () {
-                                        setState(() {
-                                          showDialog<String>(
-                                            context: context,
-                                            // false = user must tap button, true = tap outside dialog
-                                            builder:
-                                                (BuildContext dialogContext) {
-                                              return AlertDialog(
-                                                title:
-                                                    const Text('Delete Image?'),
-                                                content: const Text(
-                                                    'Are you sure you want to delete the image?'),
-                                                actions: <Widget>[
-                                                  TextButton(
-                                                    child: const Text('No'),
-                                                    onPressed: () {
+                child: image != null
+                    ? Container(
+                        alignment: Alignment.center,
+                        // width: double.maxFinite,
+                        height: 200,
+                        child: image != []
+                            ? Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: ElevatedButton(
+                                  onPressed: () {},
+                                  onLongPress: () {
+                                    setState(() {
+                                      showDialog<String>(
+                                        context: context,
+                                        // false = user must tap button, true = tap outside dialog
+                                        builder: (BuildContext dialogContext) {
+                                          return AlertDialog(
+                                            title: const Text('Delete Image?'),
+                                            content: const Text(
+                                                'Are you sure you want to delete the image?'),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                child: const Text('No'),
+                                                onPressed: () {
+                                                  Navigator.of(dialogContext)
+                                                      .pop(); // Dismiss alert dialog
+                                                },
+                                              ),
+                                              TextButton(
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      image = null;
                                                       Navigator.of(
                                                               dialogContext)
-                                                          .pop(); // Dismiss alert dialog
-                                                    },
-                                                  ),
-                                                  TextButton(
-                                                      onPressed: () {
-                                                        setState(() {
-                                                          image.removeAt(index);
-                                                          Navigator.of(
-                                                                  dialogContext)
-                                                              .pop();
-                                                        });
-                                                      },
-                                                      child: const Text('Yes'))
-                                                ],
-                                              );
-                                            },
+                                                          .pop();
+                                                    });
+                                                  },
+                                                  child: const Text('Yes'))
+                                            ],
                                           );
-                                        });
-                                      },
-                                      style: ButtonStyle(
-                                          elevation:
-                                              MaterialStateProperty.all(20),
-                                          backgroundColor:
-                                              MaterialStateProperty.all(
-                                                  Colors.transparent)),
-                                      child: Image.file(image[index],
-                                          fit: BoxFit.fitWidth),
-                                    ),
-                                  )
-                                : const Text(
-                                    'hello',
-                                    style: TextStyle(fontSize: 40),
-                                  ),
-                          );
-                        },
+                                        },
+                                      );
+                                    });
+                                  },
+                                  style: ButtonStyle(
+                                      elevation: MaterialStateProperty.all(20),
+                                      backgroundColor:
+                                          MaterialStateProperty.all(
+                                              Colors.transparent)),
+                                  child: Image.file(image!,
+                                      fit: BoxFit.fitWidth),
+                                ),
+                              )
+                            : const Text(
+                                'hello',
+                                style: TextStyle(fontSize: 40),
+                              ),
                       )
                     : const Text(
                         '',
@@ -324,7 +329,7 @@ class _SubmitSolutionState extends State<SubmitSolution> {
       floatingActionButton: FloatingActionButton.extended(
         elevation: 20,
         onPressed: () async {
-          if(solution!=null) {
+          if (solution != null) {
             showDialog<String>(
                 context: context,
                 builder: (BuildContext context) => AlertDialog(
@@ -343,7 +348,8 @@ class _SubmitSolutionState extends State<SubmitSolution> {
                               showSpinner = true;
                             });
                             try {
-                               var response =await postSolution(solution);
+                              var response =
+                                  await postSolution(solution, image);
                               if (response == 200) {
                                 _displaySuccessMotionToast();
                               } else {
@@ -359,7 +365,7 @@ class _SubmitSolutionState extends State<SubmitSolution> {
                                 showSpinner = false;
                               });
                             }
-                            image = [];
+                            image = null;
                           },
                           child: const Text('Yes'),
                         ),

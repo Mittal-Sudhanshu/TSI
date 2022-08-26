@@ -63,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<dynamic> postData(String email, String password) async {
     try {
       var response = await http.post(
-          Uri.parse('http://192.168.1.8:5000/api/user/login'),
+          Uri.parse('https://tsi-backend.herokuapp.com/api/user/login'),
           headers: header,
           body: jsonEncode({"email": email, "password": password}));
       body = jsonDecode(response.body);

@@ -35,7 +35,7 @@ class _OTPState extends State<OTP> {
   Future<dynamic> resendOTP(String name, String email, String password) async {
     try {
       var response = await http.post(
-          Uri.parse('http://192.168.1.8:5000/api/user/'),
+          Uri.parse('https://tsi-backend.herokuapp.com/api/user/'),
           headers: header,
           body:
           jsonEncode({"name": name, "email": email, "password": password}));
@@ -49,11 +49,11 @@ class _OTPState extends State<OTP> {
   void _displaySuccessMotionToast() {
     MotionToast.success(
       title: const Text(
-        'OTP',
+        'Successful',
         style: TextStyle(fontWeight: FontWeight.bold),
       ),
       description: const Text(
-        'OTP sent successfully !',
+        'Congratulation! Signup successful !',
         style: TextStyle(fontSize: 12),
       ),
       layoutOrientation: ToastOrientation.rtl,
@@ -82,7 +82,7 @@ class _OTPState extends State<OTP> {
   Future<dynamic> checkOTP(int otp) async {
     try {
       var response = await http.post(
-          Uri.parse('http://192.168.1.8:5000/api/user/validate/'),
+          Uri.parse('https://tsi-backend.herokuapp.com/api/user/validate/'),
           headers: header,
           body:
           jsonEncode({ "userOTP": otp}));
