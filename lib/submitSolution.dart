@@ -81,7 +81,7 @@ class _SubmitSolutionState extends State<SubmitSolution> {
         String fileName = image.path.split('/').last;
         FormData formData = FormData.fromMap({
           "solution": soltion,
-          "questionId":questionId,
+          "questionId": questionId,
           "image": await MultipartFile.fromFile(image.path, filename: fileName),
         });
         response = await Dio()
@@ -93,7 +93,8 @@ class _SubmitSolutionState extends State<SubmitSolution> {
         return (response.statusCode);
       } else {
         Map<String, String> header = {'Authorization': 'Bearer $token'};
-        FormData formData = FormData.fromMap({'solution': soltion,"questionId":questionId});
+        FormData formData =
+            FormData.fromMap({'solution': soltion, "questionId": questionId});
         response = await Dio()
             .post(url, data: formData, options: Options(headers: header));
         // return response.statusCode;
@@ -307,8 +308,8 @@ class _SubmitSolutionState extends State<SubmitSolution> {
                                       backgroundColor:
                                           MaterialStateProperty.all(
                                               Colors.transparent)),
-                                  child: Image.file(image!,
-                                      fit: BoxFit.fitWidth),
+                                  child:
+                                      Image.file(image!, fit: BoxFit.fitWidth),
                                 ),
                               )
                             : const Text(

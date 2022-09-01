@@ -55,23 +55,40 @@ class _SplashScreenState extends State<SplashScreen> {
 
         // primaryColors: [Color(0xFFee7752),Color(0xFF23a6d5)],
         // secondaryColors: [Color(0xFFe73c7e),Color(0xFF23d5ab)],
-        child: Column(
+        child: SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
 
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
+            children: [
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Column(
 
-            Center(child: CircularImage(radius: 150, source: 'images/lo.png',),),
-            const SizedBox(
-              height: 20,
-            ),
-            const Center(
-              child: Text(
-                'Indian Institute of Information Technology,Ranchi',
-                style: TextStyle(color: Colors.white, fontSize: 17,fontWeight: FontWeight.bold),
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Center(child: CircularImage(radius: 150, source: 'images/lo.png',),),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      const Center(
+                        child: Text(
+                          'Indian Institute of Information Technology,Ranchi',
+                          style: TextStyle(color: Colors.white, fontSize: 17,fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 250,)
+                ],
               ),
-            ),
-          ],
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: const Text('Made with ❤️ by Sudhanshu Mittal'),
+              )
+            ],
+          ),
         ),
       ),
       nextScreen: finalEmail==null?const LoginScreen():const MainScreen(),

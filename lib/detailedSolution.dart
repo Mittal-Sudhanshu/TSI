@@ -52,7 +52,7 @@ class DetailedSolution extends StatelessWidget {
               ],
             ),
           ),
-          Padding(padding:const EdgeInsets.all(0),child: questionUrl!=''?Image.network(questionUrl):null,),
+          Padding(padding:const EdgeInsets.all(0),child: questionUrl!=''?SizedBox(height: 200,width: double.infinity,child: Image.network(questionUrl)):null,),
           Center(child: Text('Solution',style:TextStyle(fontSize: 20,decoration: TextDecoration.underline),),),
 
           Row(
@@ -81,7 +81,7 @@ class DetailedSolution extends StatelessWidget {
                           fontSize: 17,
                         )),
                   ])),
-          Padding(padding:const EdgeInsets.all(0),child: imageUrl!=''?Image.network(imageUrl):null,),
+          Padding(padding:const EdgeInsets.all(0),child: imageUrl!=''?SizedBox(height:200,width:double.infinity,child: Image.network(imageUrl)):null,),
         ]));
   }
 }

@@ -140,8 +140,8 @@ class _NewQuestionState extends State<NewQuestion> {
         response = await Dio()
             .post(url, data: formData, options: Options(headers: header));
         // return response.statusCode;
-        print(response);
-        print(response.statusCode);
+        // print(response);
+        // print(response.statusCode);
         // print(body);
         return (response.statusCode);
       }
@@ -317,7 +317,7 @@ class _NewQuestionState extends State<NewQuestion> {
                                 alignment: Alignment.center,
                                 // width: double.maxFinite,
                                 height: 200,
-                                child: image != []
+                                child: image != null
                                     ? Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: ElevatedButton(
